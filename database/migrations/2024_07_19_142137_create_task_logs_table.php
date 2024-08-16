@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('outlet_name');
             $table->string('outlet_address');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->string('status');
             $table->decimal('distance', 8, 2)->nullable();
             $table->timestamps();

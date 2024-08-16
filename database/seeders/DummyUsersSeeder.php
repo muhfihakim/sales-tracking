@@ -21,12 +21,6 @@ class DummyUsersSeeder extends Seeder
                 'email' => 'admin@mybbs.id',
                 'role' => 'Admin',
                 'password' => bcrypt('admin123')
-            ],
-            [
-                'nama' => 'Asep',
-                'email' => 'sales@mybbs.id',
-                'role' => 'Sales',
-                'password' => bcrypt('sales123')
             ]
         ];
 

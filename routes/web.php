@@ -23,7 +23,7 @@ use Illuminate\Routing\Controllers\Middleware;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', [SesiController::class, 'index'])->name('login');
-    Route::post('/', [SesiController::class, 'login'])->name('aksi.login');
+    Route::post('/', [SesiController::class, 'login'])->name('aksi.login')->middleware('turnstile');
 });
 
 Route::get('/home', function () {
@@ -63,11 +63,23 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('tasks/{id}/update_status', [AdminController::class, 'updateStatusTugas'])->name('tasks.updateStatus');
     Route::get('/admin/lihat_tugas/{user_id}', [AdminController::class, 'showTasks'])->name('lihat.tugas.user')->middleware('userAkses:Admin');
 
+    Route::get('/admin/tambah_produk', [AdminController::class, 'index9'])->name('tambah.produk')->middleware('userAkses:Admin');
+    Route::post('/admin/tambah_produk', [AdminController::class, 'storeProduk'])->name('aksi.tambah.produk')->middleware('userAkses:Admin');
+    Route::get('/admin/daftar_produk', [AdminController::class, 'index10'])->name('daftar.produk')->middleware('userAkses:Admin');
+    Route::post('/check-id-produk', [AdminController::class, 'checkIdProduk'])->name('check.id.produk')->middleware('userAkses:Admin');
+    Route::get('/admin/edit_produk/{id}', [AdminController::class, 'editProduk'])->name('edit.produk')->middleware('userAkses:Admin');
+    Route::put('/admin/edit_produk/{id}', [AdminController::class, 'updateProduk'])->name('aksi.edit.produk')->middleware('userAkses:Admin');
+    Route::delete('/admin/hapus_produk/{id}', [AdminController::class, 'destroyProduk'])->name('aksi.hapus.produk')->middleware('userAkses:Admin');
+
+
+    // ROUTES UNTUK SALES
+
     Route::get('/sales', [SalesController::class, 'index'])->name('page.sales')->middleware('userAkses:Sales');
     Route::post('/sales/update-location', [SalesController::class, 'storeLocation'])->name('sales.update.location')->middleware('userAkses:Sales');
     /*     Route::get('/sales', [SalesController::class, 'index8'])->name('sales.update.location')->middleware('userAkses:Sales'); */
-    Route::get('/sales/daftar_tugas', [SalesController::class, 'index2'])->name('sales.daftar.tugas');
-    Route::put('/sales/tugas/{id}/selesai', [SalesController::class, 'selesaiTugas'])->name('tugas.sales.selesai');
-
+    Route::get('/sales/daftar_tugas', [SalesController::class, 'index2'])->name('sales.daftar.tugas')->middleware('userAkses:Sales');
+    Route::put('/sales/tugas/{id}/selesai', [SalesController::class, 'selesaiTugas'])->name('tugas.sales.selesai')->middleware('userAkses:Sales');
+    Route::get('/sales/profil/edit', [SalesController::class, 'editProfil'])->name('edit.profil.sales')->middleware('userAkses:Sales');
+    Route::put('/sales/profil/update-profil', [SalesController::class, 'updateProfil'])->name('aksi.update.profil.sales')->middleware('userAkses:Sales');
     Route::post('/logout', [SesiController::class, 'logout'])->name('aksi.logout');
 });

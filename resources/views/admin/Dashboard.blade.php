@@ -9,7 +9,6 @@
                     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                         <div>
                             <h2 class="text-white pb-2 fw-bold">Dashboard Sistem Informasi Sales dan Pengiriman</h2>
-                            <h5 class="text-white op-7 mb-2">by : BBS-Web Developer</h5>
                         </div>
                         <div class="ml-md-auto py-2 py-md-0">
                             <a href="{{ route('tambah.sales') }}" class="btn btn-secondary btn-round btn-sm"> <i
@@ -106,7 +105,7 @@
                                                         @else
                                                             -
                                                         @endif
-                                                    </td>s
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -268,7 +267,10 @@
     </script>
     <script>
         $(document).ready(function() {
-            $('#basic-datatables').DataTable({});
+            $('#basic-datatables').DataTable({
+                "pageLength": 5, // Menampilkan 5 item/data per halaman
+                "lengthMenu": [5, 10, 25, 50] // Pilihan untuk jumlah item per halaman
+            });
         });
     </script>
 @endsection

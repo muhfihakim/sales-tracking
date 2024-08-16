@@ -5,7 +5,7 @@
         <div class="sidebar-content">
             <div class="user">
                 <div class="avatar-sm float-left mr-2">
-                    <img src="{{ asset('assets/img/profile.jpg') }}" alt="..." class="avatar-img rounded-circle">
+                    <img src="{{ asset('assets/img/profile.jpg') }}" alt="Logo" class="avatar-img rounded-circle">
                 </div>
                 <div class="info">
                     <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
@@ -111,12 +111,12 @@
                     <div class="collapse" id="produk">
                         <ul class="nav nav-collapse">
                             <li>
-                                <a href="#">
+                                <a href="{{ route('tambah.produk') }}">
                                     <span class="sub-item">Tambah Produk</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="{{ route('daftar.produk') }}">
                                     <span class="sub-item">Daftar Produk</span>
                                 </a>
                             </li>

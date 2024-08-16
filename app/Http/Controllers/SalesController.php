@@ -12,14 +12,73 @@ class SalesController extends Controller
 {
     public function index()
     {
-        return view('sales.Dashboard');
+        $user = Auth::user();
+
+        // Mengambil jumlah tugas hari ini untuk sales
+        $tasksToday = Task::whereDate('created_at', today())->where('sales_id', $user->id)->count();
+
+        // Mengambil jumlah tugas selesai untuk sales
+        $tasksCompleted = Task::where('status', 'Selesai')->where('sales_id', $user->id)->count();
+
+        // Mengambil jumlah tugas pending untuk sales
+        $tasksPending = Task::where('status', 'Pending')->where('sales_id', $user->id)->count();
+
+
+        return view('sales.Dashboard', compact('tasksToday', 'tasksCompleted', 'tasksPending'));
     }
 
-    public function index2()
+    /*     public function index2()
     {
         $salesId = Auth::user()->id;
         $tasks = Task::where('sales_id', $salesId)->with(['outlet'])->get();
         return view('sales.DaftarTugas', compact('tasks'));
+    } */
+
+    public function index2()
+    {
+        $salesId = Auth::user()->id;
+
+        // Ambil lokasi sales dari tabel locations
+        $salesLocation = \DB::table('locations')
+            ->where('sales_id', $salesId)
+            ->latest('created_at') // Ambil lokasi terbaru
+            ->first();
+
+        // Ambil tugas dengan status 'Pending'
+        $tasks = Task::where('sales_id', $salesId)
+            ->where('status', 'Pending')
+            ->with(['outlet'])
+            ->get();
+
+        return view('sales.DaftarTugas', compact('tasks', 'salesLocation'));
+    }
+
+    public function editProfil()
+    {
+        $user = Auth::user(); // Mengambil pengguna yang sedang login
+        return view('sales.EditProfil', compact('user'));
+    }
+
+    // Menyimpan perubahan edit profil
+    public function updateProfil(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'password' => 'nullable|confirmed|min:6',
+        ]);
+
+        $user = Auth::user();
+        $user->nama = $request->input('nama');
+        $user->email = $request->input('email');
+
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->input('password'));
+        }
+
+        $user->save();
+
+        return redirect()->route('edit.profil.sales')->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function storeLocation(Request $request)

@@ -11,6 +11,8 @@ class Task extends Model
 
     protected $fillable = [
         'sales_id',
+        'product_id',
+        'qty',
         'outlet_id',
         'deskripsi',
         'status',
@@ -24,6 +26,11 @@ class Task extends Model
     public function sales()
     {
         return $this->belongsTo(User::class, 'sales_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'kode_produk');
     }
 
     public function getDistanceAttribute()
