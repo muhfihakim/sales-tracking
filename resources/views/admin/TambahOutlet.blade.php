@@ -26,27 +26,28 @@
                                             <div class="form-group">
                                                 <label for="id_outlet">ID Outlet</label>
                                                 <input type="text" class="form-control" id="id_outlet" name="id_outlet"
-                                                    required>
+                                                    placeholder="Masukkan ID Outlet" required>
                                                 <small id="id_outlet_status"></small>
                                             </div>
                                             <div class="form-group">
                                                 <label for="nama_outlet">Nama Outlet</label>
                                                 <input type="text" class="form-control" id="nama_outlet"
-                                                    name="nama_outlet" required>
+                                                    placeholder="Masukkan Nama Outlet" name="nama_outlet" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="alamat_outlet">Alamat Outlet</label>
-                                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3" required></textarea>
+                                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
+                                                    placeholder="Masukkan Alamat Lengkap Outlet"></textarea>
                                             </div>
                                             <div class="form-group">
                                                 <label for="latitude">Latitude</label>
                                                 <input type="text" class="form-control" id="latitude" name="latitude"
-                                                    readonly>
+                                                    placeholder="Isi Manual Berdasarkan Koordinat Latitude">
                                             </div>
                                             <div class="form-group">
                                                 <label for="longitude">Longitude</label>
                                                 <input type="text" class="form-control" id="longitude" name="longitude"
-                                                    readonly>
+                                                    placeholder="Isi Manual Berdasarkan Koordinat Longitude">
                                             </div>
                                             <button type="submit" id="btn-submit" class="btn btn-success btn-sm">Tambah
                                                 Outlet</button>
@@ -54,7 +55,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div id="mapid" style="height: 400px;"></div>
-                                        <small class="form-text text-muted">Klik pada peta untuk menentukan lokasi.</small>
+                                        <small class="form-text text-muted">Peta tersebut menjadi acuan titik
+                                            lokasi.</small>
                                     </div>
                                 </div>
                             </div>

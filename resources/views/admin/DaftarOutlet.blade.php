@@ -41,6 +41,10 @@
                                                     <td>{{ $outlet->latitude }}</td>
                                                     <td>{{ $outlet->longitude }}</td>
                                                     <td>
+                                                        <a href="https://www.google.com/maps?q={{ $outlet->latitude }},{{ $outlet->longitude }}"
+                                                            target="_blank" class="btn btn-info btn-sm">
+                                                            <i class="fas fa-map-marker-alt"></i> Lihat Gmaps
+                                                        </a>
                                                         <a href="{{ route('edit.outlet', $outlet->id) }}"
                                                             class="btn btn-warning btn-sm"> <i class="far fa-edit"></i>
                                                             Edit</a>

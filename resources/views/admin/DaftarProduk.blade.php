@@ -91,7 +91,7 @@
                                                     style="width: 100%;">
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
+                                                <button type="button" class="btn btn-secondary btm-sm"
                                                     data-dismiss="modal">Tutup</button>
                                             </div>
                                         </div>

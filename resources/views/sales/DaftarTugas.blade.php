@@ -26,7 +26,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Daftar Tugas</h4>
-                                <div id="status">Lokasi Loading...</div>
+                                {{-- <div id="status">Lokasi Loading...</div> --}}
                             </div>
                             <div class="card-body">
                                 @if (session('success'))
@@ -60,7 +60,7 @@
                                                         @if ($task->status == 'Selesai')
                                                             <span class="badge badge-success">Diselesaikan</span>
                                                         @else
-                                                            @if ($task->distance && $task->distance <= 1)
+                                                            @if ($task->distance && $task->distance <= 0.1)
                                                                 <form action="{{ route('tugas.sales.selesai', $task->id) }}"
                                                                     method="POST" style="margin-top: 5px;">
                                                                     @csrf
@@ -103,12 +103,10 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <!-- Turf.js for spatial analysis -->
     <script src="https://unpkg.com/@turf/turf"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize the map
             var map = L.map('map').setView([-6.200000, 106.816666], 5); // Center the map on Indonesia
-            /* var map = L.map('map').setView([{{ $salesLocation->latitude }}, {{ $salesLocation->longitude }}], 12); */
 
             // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -116,65 +114,77 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            // Add marker for the sales location (blue)
-            L.marker([{{ $salesLocation->latitude }}, {{ $salesLocation->longitude }}], {
-                    icon: L.icon({
-                        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    })
-                }).addTo(map)
-                .bindPopup(
-                    '<b>Lokasi Sales</b><br>Latitude: {{ $salesLocation->latitude }}<br>Longitude: {{ $salesLocation->longitude }}'
-                );
+            // Cek apakah salesLocation ada dan memiliki latitude dan longitude
+            @if (isset($salesLocation) && $salesLocation->latitude && $salesLocation->longitude)
+                // Add marker for the sales location (blue)
+                L.marker([{{ $salesLocation->latitude }}, {{ $salesLocation->longitude }}], {
+                        icon: L.icon({
+                            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        })
+                    }).addTo(map)
+                    .bindPopup(
+                        '<b>Lokasi Sales</b><br>Latitude: {{ $salesLocation->latitude }}<br>Longitude: {{ $salesLocation->longitude }}'
+                    );
 
-            // Prepare waypoints for routing
-            var waypoints = [
-                L.latLng({{ $salesLocation->latitude }},
-                    {{ $salesLocation->longitude }}), // Start at the sales location
+                // Prepare waypoints for routing
+                var waypoints = [
+                    L.latLng({{ $salesLocation->latitude }},
+                        {{ $salesLocation->longitude }}), // Start at the sales location
+                    @foreach ($tasks as $task)
+                        L.latLng({{ $task->outlet->latitude }}, {{ $task->outlet->longitude }}),
+                    @endforeach
+                ];
+
+                // Add routing control to show the route and directions
+                if (waypoints.length > 1) {
+                    L.Routing.control({
+                        waypoints: waypoints,
+                        routeWhileDragging: false,
+                        geocoder: L.Control.Geocoder.nominatim(),
+                        lineOptions: {
+                            styles: [{
+                                color: 'blue',
+                                opacity: 1,
+                                weight: 5
+                            }]
+                        }
+                    }).addTo(map);
+                } else {
+                    console.log(
+                    'Not enough waypoints for routing'); // Debugging: Check if enough waypoints are present
+                }
+
+                // Add geofence as a circle around the sales location and each outlet
+                function addGeofence(lat, lng, radius, color) {
+                    return L.circle([lat, lng], {
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: 0.2,
+                        radius: radius // Radius in meters
+                    }).addTo(map);
+                }
+
+                var geofenceRadius = 50; // Meters
+                addGeofence({{ $salesLocation->latitude }}, {{ $salesLocation->longitude }}, geofenceRadius,
+                    'green');
+
                 @foreach ($tasks as $task)
-                    L.latLng({{ $task->outlet->latitude }}, {{ $task->outlet->longitude }}),
+                    addGeofence({{ $task->outlet->latitude }}, {{ $task->outlet->longitude }}, geofenceRadius,
+                        'red');
                 @endforeach
-            ];
-
-            // Add routing control to show the route and directions
-            if (waypoints.length > 1) {
-                L.Routing.control({
-                    waypoints: waypoints,
-                    routeWhileDragging: false,
-                    geocoder: L.Control.Geocoder.nominatim(),
-                    lineOptions: {
-                        styles: [{
-                            color: 'blue',
-                            opacity: 1,
-                            weight: 5
-                        }]
-                    }
-                }).addTo(map);
-            } else {
-                console.log('Not enough waypoints for routing'); // Debugging: Check if enough waypoints are present
-            }
-
-            // Add geofence as a circle around the sales location and each outlet
-            function addGeofence(lat, lng, radius, color) {
-                return L.circle([lat, lng], {
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.2,
-                    radius: radius // Radius in meters
-                }).addTo(map);
-            }
-
-            // Example: Add geofence with 1000 meter radius around sales location and each outlet
-            var geofenceRadius = 1000; // 1000 meters
-            addGeofence({{ $salesLocation->latitude }}, {{ $salesLocation->longitude }}, geofenceRadius, 'green');
-
-            @foreach ($tasks as $task)
-                addGeofence({{ $task->outlet->latitude }}, {{ $task->outlet->longitude }}, geofenceRadius, 'red');
-            @endforeach
+            @else
+                // Jika lokasi tidak tersedia, tampilkan pesan
+                var message = "Tunggu sampai aplikasi mendapatkan lokasi kamu";
+                var popup = L.popup()
+                    .setLatLng([-6.200000, 106.816666]) // Posisi popup di tengah peta
+                    .setContent(message)
+                    .openOn(map);
+            @endif
         });
     </script>
 @endsection

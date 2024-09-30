@@ -24,6 +24,7 @@
                                     <table id="basic-datatables" class="display table table-striped table-hover">
                                         <thead>
                                             <tr>
+                                                <td>ID</td>
                                                 <th>Nama Sales</th>
                                                 <th>Email</th>
                                                 <th>Jenis Kelamin</th>
@@ -38,6 +39,7 @@
                                         <tbody>
                                             @foreach ($sales as $sale)
                                                 <tr>
+                                                    <td>{{ $sale->id }}</td>
                                                     <td>{{ $sale->nama }}</td>
                                                     <td>{{ $sale->user->email }}</td>
                                                     <td>{{ $sale->jenis_kelamin }}</td>

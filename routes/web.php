@@ -23,7 +23,7 @@ use Illuminate\Routing\Controllers\Middleware;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', [SesiController::class, 'index'])->name('login');
-    Route::post('/', [SesiController::class, 'login'])->name('aksi.login')->middleware('turnstile');
+    Route::post('/', [SesiController::class, 'login'])->name('aksi.login')/* ->middleware('turnstile') */;
 });
 
 Route::get('/home', function () {

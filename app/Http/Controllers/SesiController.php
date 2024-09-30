@@ -34,7 +34,7 @@ class SesiController extends Controller
                 return redirect('/sales');
             }
         } else {
-            return redirect('')->withErrors('Akun tidak ditemukan!')->withInput();
+            return redirect()->back()->withErrors(['login' => 'Akun tidak ditemukan / Email atau Password salah!'])->withInput();
         }
     }
 

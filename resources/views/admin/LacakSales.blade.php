@@ -152,8 +152,8 @@
             }).addTo(map);
         }
 
-        // Example: Add geofence with 1000 meter radius around latest location and each outlet
-        var geofenceRadius = 1000; // 1000 meters
+        // Example: Add geofence with 50 meter radius around latest location and each outlet
+        var geofenceRadius = 50; // 50 meters
         addGeofence({{ $latestLocation->latitude }}, {{ $latestLocation->longitude }}, geofenceRadius, 'green');
 
         @foreach ($salesTasks as $task)

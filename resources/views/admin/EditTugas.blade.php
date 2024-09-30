@@ -1,7 +1,33 @@
 @extends('admin.Layout.Index')
 @section('css')
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        /* Kustomisasi tampilan Select2 agar konsisten dengan form-control */
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #ebedf2;
+            /* Sesuaikan dengan border form-control */
+            border-radius: .25rem;
+            /* Sesuaikan dengan border-radius form-control */
+            height: calc(2.25rem + 2px);
+            /* Sesuaikan dengan tinggi form-control */
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 1.5;
+            /* Sesuaikan dengan tinggi form-control */
+            padding: 0.375rem 0.75rem;
+            /* Sesuaikan dengan padding form-control */
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: calc(2.25rem + 2px);
+            /* Sesuaikan dengan tinggi form-control */
+        }
+    </style>
 @endsection
 @section('content')
     <div class="main-panel">
@@ -23,17 +49,17 @@
                                             @csrf
                                             @method('PUT')
                                             <div class="form-group">
-                                                <label for="sales_id">Sales</label>
+                                                <label for="sales_id">Sales Yang Ditugaskan</label>
                                                 <select class="form-control" id="sales_id" name="sales_id" required>
                                                     @foreach ($sales as $s)
                                                         <option value="{{ $s->id }}"
                                                             {{ $task->sales_id == $s->id ? 'selected' : '' }}>
-                                                            {{ $s->nama }}</option>
+                                                            {{ $s->id }} - {{ $s->nama }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="form-group">
-                                                <label for="outlet_id">Outlet</label>
+                                                <label for="outlet_id">Tujuan Outlet</label>
                                                 <select class="form-control" id="outlet_id" name="outlet_id" required>
                                                     @foreach ($outlets as $outlet)
                                                         <option value="{{ $outlet->id }}"
@@ -41,7 +67,7 @@
                                                             data-lat="{{ $outlet->latitude }}"
                                                             data-lng="{{ $outlet->longitude }}"
                                                             {{ $task->outlet_id == $outlet->id ? 'selected' : '' }}>
-                                                            {{ $outlet->nama }}
+                                                            {{ $outlet->id }} - {{ $outlet->nama }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -52,7 +78,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="deskripsi">Deskripsi Tugas</label>
-                                                <textarea class="form-control" id="deskripsi" name="deskripsi" required>{{ $task->deskripsi }}</textarea>
+                                                <textarea class="form-control" id="deskripsi" name="deskripsi" placeholder="Opsional">{{ $task->deskripsi }}</textarea>
                                             </div>
                                             <a href="{{ route('daftar.tugas') }}"
                                                 class="btn btn-secondary btn-sm">Kembali</a>
@@ -110,6 +136,30 @@
 
             // Trigger change event to set initial map and address
             outletSelect.dispatchEvent(new Event('change'));
+        });
+    </script>
+    <!-- jQuery (harus ada sebelum Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#sales_id').select2({
+                placeholder: 'Pilih Sales Yang Akan Ditugaskan',
+                allowClear: false
+            });
+
+            $('#outlet_id').select2({
+                placeholder: 'Pilih Outlet Tujuan',
+                allowClear: false
+            });
+
+            $('#product_id').select2({
+                placeholder: 'Pilih Produk Yang Akan Dikirim',
+                allowClear: false
+            });
         });
     </script>
 @endsection

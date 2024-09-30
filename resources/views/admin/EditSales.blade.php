@@ -15,6 +15,15 @@
                                 <h4 class="card-title">Edit Sales</h4>
                             </div>
                             <div class="card-body">
+                                @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                 <div class="row">
                                     <div class="col-md-6 col-lg-4">
                                         <form action="{{ route('aksi.edit.sales', $sales->id) }}" method="POST">
@@ -23,17 +32,17 @@
                                             <div class="form-group">
                                                 <label for="nama">Nama Sales</label>
                                                 <input type="text" class="form-control" id="nama" name="nama"
-                                                    value="{{ $sales->nama }}" required>
+                                                    value="{{ $sales->nama }}" placeholder="Masukkan Nama Sales" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="email">Email</label>
                                                 <input type="email" class="form-control" id="email" name="email"
-                                                    value="{{ $sales->user->email }}" required>
+                                                    value="{{ $sales->user->email }}" placeholder="Masukkan Email" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="password">Password</label>
                                                 <input type="password" class="form-control" id="password" name="password"
-                                                    placeholder="Biarkan kosong jika tidak ingin mengubah password">
+                                                    placeholder="Kosongkan Jika Password Tidak Berubah">
                                             </div>
                                             <div class="form-group">
                                                 <label for="jenis_kelamin">Jenis Kelamin</label>
@@ -62,7 +71,8 @@
                                             <div class="form-group">
                                                 <label for="plat_kendaraan">Plat Kendaraan</label>
                                                 <input type="text" class="form-control" id="plat_kendaraan"
-                                                    name="plat_kendaraan" value="{{ $sales->plat_kendaraan }}" required>
+                                                    name="plat_kendaraan" value="{{ $sales->plat_kendaraan }}"
+                                                    placeholder="Gunakan Format : X XXXX XX" required>
                                             </div>
                                             <a href="{{ route('daftar.sales') }}"
                                                 class="btn btn-secondary btn-sm">Kembali</a>

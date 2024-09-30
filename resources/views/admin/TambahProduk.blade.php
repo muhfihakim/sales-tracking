@@ -1,9 +1,5 @@
 @extends('admin.Layout.Index')
 @section('css')
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Leaflet Control Geocoder CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 @endsection
 @section('content')
     <div class="main-panel">
@@ -27,28 +23,39 @@
                                             <div class="form-group">
                                                 <label for="id_produk">ID Produk</label>
                                                 <input type="text" class="form-control" id="id_produk" name="id_produk"
-                                                    required>
+                                                    placeholder="Masukkan ID Produk" required>
                                                 <small id="id_produk_status"></small>
                                             </div>
                                             <div class="form-group">
                                                 <label for="nama_produk">Nama Produk</label>
                                                 <input type="text" class="form-control" id="nama_produk"
-                                                    name="nama_produk" required>
+                                                    name="nama_produk" placeholder="Masukkan Nama Produk" required>
                                             </div>
                                             <div class="form-group">
-                                                <label for="qty">Qty (Satuan Dus)</label>
-                                                <input type="number" class="form-control" id="qty" name="qty"
-                                                    required>
+                                                <label for="qty">Qty Produk</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="qty" name="qty"
+                                                        placeholder="Masukkan Kuantitas Produk/Dus" aria-describedby="dus"
+                                                        required>
+                                                    <span class="input-group-text" id="dus">Dus</span>
+                                                </div>
+                                                @error('qty')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="form-group">
-                                                <label for="harga">Harga Produk</label>
+                                                <label for="harga">Harga Produk (Satuan Dus)</label>
                                                 <input type="number" class="form-control" id="harga" name="harga"
-                                                    step="0.01" required>
+                                                    step="0.01" placeholder="Masukkan Harga Produk/Dus" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="gambar">Gambar</label>
-                                                <input type="file" class="form-control-file" id="gambar"
-                                                    name="gambar" accept="image/*">
+                                                <div class="d-flex">
+                                                    <input type="file" class="form-control-file" id="gambar"
+                                                        name="gambar" accept="image/*">
+                                                    <img id="image-preview" src="" alt="Pratinjau Gambar"
+                                                        style="display: none; max-width: 200px; margin-left: 20px;">
+                                                </div>
                                             </div>
                                             <button type="submit" id="btn-submit" class="btn btn-success btn-sm">Tambah
                                                 Produk</button>
@@ -81,7 +88,7 @@
                             $('#id_produk_status').removeClass('text-success').addClass(
                                 'text-danger').text('ID Produk sudah digunakan');
                             $('#btn-submit').prop('disabled',
-                            true); // Nonaktifkan tombol submit
+                                true); // Nonaktifkan tombol submit
                         } else {
                             $('#id_produk_status').removeClass('text-danger').addClass(
                                 'text-success').text('ID Produk tersedia');
@@ -89,6 +96,22 @@
                         }
                     }
                 });
+            });
+
+            // Pratinjau gambar
+            $('#gambar').on('change', function() {
+                var file = this.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $('#image-preview').attr('src', e.target.result).show();
+                }
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#image-preview').hide();
+                }
             });
         });
     </script>

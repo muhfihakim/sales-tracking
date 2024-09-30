@@ -100,13 +100,27 @@ class AdminController extends Controller
 
     public function storeSales(Request $request)
     {
+        // Validasi request
         $request->validate([
             'nama' => 'required',
             'jenis_kelamin' => 'required',
             'jenis_kendaraan' => 'required',
-            'plat_kendaraan' => 'required',
+            'plat_kendaraan' => 'required|unique:sales,plat_kendaraan',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6'
         ]);
+
+        // Cek jika plat_kendaraan sudah ada di tabel Sales
+        $existingSales = Sales::where('plat_kendaraan', $request->plat_kendaraan)->first();
+        if ($existingSales) {
+            return redirect()->back()->withErrors(['plat_kendaraan' => 'Plat kendaraan sudah ada.'])->withInput();
+        }
+
+        // Cek jika email sudah ada di tabel Users
+        $existingUser = User::where('email', $request->email)->first();
+        if ($existingUser) {
+            return redirect()->back()->withErrors(['email' => 'Email sudah terdaftar.'])->withInput();
+        }
 
         // Simpan ke tabel Sales
         $sales = Sales::create([
@@ -127,6 +141,7 @@ class AdminController extends Controller
 
         return redirect()->route('daftar.sales')->with('success', 'Sales berhasil ditambahkan');
     }
+
 
     public function editSales($id)
     {
@@ -152,27 +167,37 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'Sales tidak ditemukan');
         }
 
-        // Update data Sales
-        $sales->nama = $request->nama;
-        $sales->jenis_kelamin = $request->jenis_kelamin;
-        $sales->jenis_kendaraan = $request->jenis_kendaraan;
-        $sales->plat_kendaraan = $request->plat_kendaraan;
+        // Cek jika plat_kendaraan atau email sudah ada di tabel lain
+        $existingSales = Sales::where('plat_kendaraan', $request->plat_kendaraan)
+            ->where('id', '!=', $id) // Ignore current sales record
+            ->first();
+        if ($existingSales) {
+            return redirect()->back()->withErrors(['plat_kendaraan' => 'Plat kendaraan sudah ada.'])->withInput();
+        }
 
-        // Simpan perubahan pada model Sales
-        $sales->save();
+        $existingUser = User::where('email', $request->email)
+            ->where('sales_id', '!=', $id) // Ignore current user record
+            ->first();
+        if ($existingUser) {
+            return redirect()->back()->withErrors(['email' => 'Email sudah terdaftar.'])->withInput();
+        }
+
+        // Update data Sales
+        $sales->update([
+            'nama' => $request->nama,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'jenis_kendaraan' => $request->jenis_kendaraan,
+            'plat_kendaraan' => $request->plat_kendaraan,
+        ]);
 
         // Update data User terkait (jika ada)
         if ($sales->user) {
-            $sales->user->nama = $request->nama; // Update nama User
-            $sales->user->email = $request->email; // Update email User
-
-            // Update password jika diisi
-            if ($request->filled('password')) {
-                $sales->user->password = Hash::make($request->password);
-            }
-
-            // Simpan perubahan pada model User
-            $sales->user->save();
+            $user = $sales->user;
+            $user->update([
+                'nama' => $request->nama,
+                'email' => $request->email,
+                'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
+            ]);
         }
 
         return redirect()->route('daftar.sales')->with('success', 'Sales berhasil diupdate');
@@ -249,8 +274,10 @@ class AdminController extends Controller
     public function updateOutlet(Request $request, $id)
     {
         $request->validate([
-            'nama_outlet' => 'required',
+            'nama_outlet'   => 'required',
             'alamat_outlet' => 'required',
+            'latitude'      => 'nullable',
+            'longitude'     => 'nullable',
         ]);
 
         $outlet = Outlet::find($id);
@@ -259,8 +286,10 @@ class AdminController extends Controller
         }
 
         // Update data outlet
-        $outlet->nama = $request->nama_outlet;
+        $outlet->nama   = $request->nama_outlet;
         $outlet->alamat = $request->alamat_outlet;
+        $outlet->latitude   = $request->latitude;
+        $outlet->longitude  = $request->longitude;
         $outlet->save();
 
         return redirect()->route('daftar.outlet')->with('success', 'Outlet berhasil diperbarui');
@@ -283,7 +312,7 @@ class AdminController extends Controller
         $tasks = Task::with(['sales', 'outlet'])
             ->select('tasks.*') // Pastikan mengambil semua kolom dari tabel tugas
             ->get();
-        return view('admin.daftarTugas', compact('tasks'));
+        return view('admin.DaftarTugas', compact('tasks'));
     }
 
 
@@ -293,7 +322,7 @@ class AdminController extends Controller
         $outlets = Outlet::all();
         $products = Product::all();
 
-        return view('admin.tambahTugas', compact('users', 'outlets', 'products'));
+        return view('admin.TambahTugas', compact('users', 'outlets', 'products'));
     }
 
     public function storeTugas(Request $request)
@@ -327,7 +356,7 @@ class AdminController extends Controller
 
             return redirect()->route('daftar.tugas')->with('success', 'Tugas berhasil ditambahkan.');
         } else {
-            return redirect()->back()->withErrors(['qty' => 'Kuantitas tidak mencukupi.']);
+            return redirect()->back()->withInput()->withErrors(['qty' => 'Kuantitas Produk tidak mencukupi.']);
         }
     }
 

@@ -27,26 +27,31 @@
                                             <div class="form-group">
                                                 <label for="id_outlet">ID Outlet</label>
                                                 <input type="text" class="form-control" id="id_outlet" name="id_outlet"
-                                                    value="{{ $outlet->id }}">
+                                                    value="{{ $outlet->id }}" disabled>
+                                                <small>ID Outlet Tidak Bisa Diubah.</small>
                                             </div>
                                             <div class="form-group">
                                                 <label for="nama_outlet">Nama Outlet</label>
                                                 <input type="text" class="form-control" id="nama_outlet"
-                                                    name="nama_outlet" value="{{ $outlet->nama }}">
+                                                    name="nama_outlet" value="{{ $outlet->nama }}"
+                                                    placeholder="Masukkan Nama Outlet">
                                             </div>
                                             <div class="form-group">
                                                 <label for="alamat_outlet">Alamat Outlet</label>
-                                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3">{{ $outlet->alamat }}</textarea>
+                                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
+                                                    placeholder="Masukkan Alamat Lengkap Outlet">{{ $outlet->alamat }}</textarea>
                                             </div>
                                             <div class="form-group">
                                                 <label for="latitude">Latitude</label>
                                                 <input type="text" class="form-control" id="latitude" name="latitude"
-                                                    value="{{ $outlet->latitude }}">
+                                                    value="{{ $outlet->latitude }}"
+                                                    placeholder="Isi Manual Berdasarkan Koordinat Latitude">
                                             </div>
                                             <div class="form-group">
                                                 <label for="longitude">Longitude</label>
                                                 <input type="text" class="form-control" id="longitude" name="longitude"
-                                                    value="{{ $outlet->longitude }}">
+                                                    value="{{ $outlet->longitude }}"
+                                                    placeholder="Isi Manual Berdasarkan Koordinat Longitude">
                                             </div>
                                             <a href="{{ route('daftar.outlet') }}"
                                                 class="btn btn-secondary btn-sm">Kembali</a>
@@ -55,7 +60,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div id="mapid" style="height: 400px;"></div>
-                                        <small class="form-text text-muted">Klik pada peta untuk menentukan lokasi.</small>
+                                        <small class="form-text text-muted">Peta tersebut menjadi acuan titik
+                                            lokasi.</small>
                                     </div>
                                 </div>
                             </div>
@@ -146,6 +152,23 @@
                 document.getElementById('latitude').value = position.lat;
                 document.getElementById('longitude').value = position.lng;
             });
+        });
+    </script>
+    <script>
+        // Create a marker with the existing coordinates
+        var initialLatLng = L.latLng({{ $outlet->latitude }}, {{ $outlet->longitude }});
+        marker = L.marker(initialLatLng, {
+            draggable: true
+        }).addTo(map);
+
+        // Set initial map view to the marker's position
+        map.setView(initialLatLng, 16);
+
+        // Update latitude and longitude fields on marker drag
+        marker.on('dragend', function(e) {
+            var position = marker.getLatLng();
+            document.getElementById('latitude').value = position.lat;
+            document.getElementById('longitude').value = position.lng;
         });
     </script>
 @endsection

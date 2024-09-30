@@ -9,6 +9,7 @@
                     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                         <div>
                             <h2 class="text-white pb-2 fw-bold">Sistem Informasi Sales dan Pengiriman</h2>
+                            {{-- <div id="status"></div> --}}
                         </div>
                     </div>
                 </div>

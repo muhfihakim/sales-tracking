@@ -22,46 +22,75 @@
 <!-- Atlantis DEMO methods, don't include it in your project! -->
 <script src="{{ asset('assets/js/setting-demo2.js') }}"></script>
 <script>
-    // Set interval to send location every 10 seconds
-    setInterval(() => {
+    // Initialize variables to store the last known location
+    let lastLat = null;
+    let lastLng = null;
+
+    // Function to send the location to the server
+    function sendLocation(lat, lng) {
+        const url = '{{ route('sales.update.location') }}'; // Rute yang sesuai
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    sales_id: '{{ auth()->user()->id }}',
+                    latitude: lat,
+                    longitude: lng
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Location updated successfully');
+                    document.getElementById('status').innerText =
+                        `Location updated: Latitude: ${lat}, Longitude: ${lng}`;
+                } else if (data.status === 'exists') {
+                    console.log('Location already exists. No update needed.');
+                    document.getElementById('status').innerText =
+                        `Location already exists: Latitude: ${lat}, Longitude: ${lng}`;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Function to check location and send updates
+    function checkLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
 
-                document.getElementById('status').innerText = `Latitude: ${lat}, Longitude: ${lng}`;
+                // Optionally log the location for debugging
+                console.log(`Latitude: ${lat}, Longitude: ${lng}`);
 
-                // Send location to the server
-                fetch('{{ route('sales.update.location') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                .getAttribute('content')
-                        },
-                        body: JSON.stringify({
-                            sales_id: '{{ auth()->user()->id }}',
-                            latitude: lat,
-                            longitude: lng
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            console.log('Location updated successfully');
-                        } else {
-                            console.error('Failed to update location', data);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                // Check if the location has changed
+                if (lat !== lastLat || lng !== lastLng) {
+                    // Update the last known location
+                    lastLat = lat;
+                    lastLng = lng;
+
+                    // Send location to the server
+                    sendLocation(lat, lng);
+                } else {
+                    console.log('Location has not changed. No need to send update.');
+                }
             }, error => {
-                console.error(error);
+                console.error('Geolocation error:', error);
             });
         } else {
-            document.getElementById('status').innerText = 'Geolocation is not supported by this browser.';
+            console.error('Geolocation is not supported by this browser.');
         }
-    }, 5000);
+    }
+
+    // Set interval to check location every 5 seconds
+    setInterval(checkLocation, 5000); // 5000 ms = 5 detik
 </script>
+
 @yield('scripts')
 </body>
 
